@@ -9,8 +9,4 @@ import java.util.List;
 
 @Repository
 public interface FindImageRepository extends JpaRepository<FindImage, Long> {
-    void deleteAllByFind(Find find);
-
-    @Query("select li.imageName from FindImage li")
-    List<String> getImageNames(Long lostId);
 }

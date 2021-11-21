@@ -1,10 +1,10 @@
 package dsm.findappple.dsm_findapple_server_socket.entity.lost;
 
-import dsm.project.findapple.entity.area.Area;
-import dsm.project.findapple.entity.comment.Comment;
-import dsm.project.findapple.entity.images.lost.LostImage;
-import dsm.project.findapple.entity.user.User;
-import dsm.project.findapple.payload.enums.Category;
+import dsm.findappple.dsm_findapple_server_socket.entity.area.Area;
+import dsm.findappple.dsm_findapple_server_socket.entity.comment.Comment;
+import dsm.findappple.dsm_findapple_server_socket.entity.images.lost.LostImage;
+import dsm.findappple.dsm_findapple_server_socket.entity.user.User;
+import dsm.findappple.dsm_findapple_server_socket.payload.enums.Category;
 import lombok.*;
 
 import javax.persistence.*;

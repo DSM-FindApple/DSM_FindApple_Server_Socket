@@ -8,6 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    Optional<Comment> findTop1ByLost_LostIdOrderByWriteAtDesc(Long lost_lostId);
-    Optional<Comment> findTop1ByFind_FindIdOrderByWriteAtDesc(Long find_findId);
 }
