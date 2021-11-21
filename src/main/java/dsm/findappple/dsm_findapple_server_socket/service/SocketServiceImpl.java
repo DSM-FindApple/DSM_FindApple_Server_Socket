@@ -27,8 +27,8 @@ import dsm.findappple.dsm_findapple_server_socket.utils.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -375,7 +375,7 @@ public class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
@@ -392,7 +392,7 @@ public class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
@@ -414,7 +414,7 @@ public class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
@@ -434,7 +434,7 @@ public class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
