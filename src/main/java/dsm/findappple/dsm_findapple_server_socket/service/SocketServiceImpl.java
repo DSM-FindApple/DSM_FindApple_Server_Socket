@@ -183,9 +183,7 @@ public class SocketServiceImpl implements SocketService {
 
         sendInfo(client, message, deviceTokens);
 
-        chatUserRepository.deleteChatUsers(optionalChat.get());
-        messageRepository.deleteMessages(optionalChat.get());
-        chatRepository.deleteChat(chatId);
+        chatRepository.deleteByChatId(chatId);
     }
 
     @Override
