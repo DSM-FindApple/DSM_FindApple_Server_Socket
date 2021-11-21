@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MessageImageRepository extends JpaRepository<MessageImage, Long> {
+    MessageImage findByMessage_MessageId(Long message_messageId);
 }

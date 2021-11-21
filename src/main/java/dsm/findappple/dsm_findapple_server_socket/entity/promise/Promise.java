@@ -1,6 +1,7 @@
 package dsm.findappple.dsm_findapple_server_socket.entity.promise;
 
 import dsm.findappple.dsm_findapple_server_socket.entity.area.Area;
+import dsm.findappple.dsm_findapple_server_socket.entity.message.Message;
 import dsm.findappple.dsm_findapple_server_socket.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,4 +38,8 @@ public class Promise {
     @OneToOne
     @JoinColumn(name = "area_code")
     private Area area;
+
+    @OneToOne
+    @JoinColumn(name = "message_id")
+    private Message message;
 }

@@ -1,14 +1,14 @@
 package dsm.findappple.dsm_findapple_server_socket.entity.chat;
 
+import dsm.findappple.dsm_findapple_server_socket.entity.chat_user.ChatUser;
+import dsm.findappple.dsm_findapple_server_socket.entity.message.Message;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Builder
@@ -20,5 +20,9 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String chatId;
 
-    private String title;
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    private List<ChatUser> chatUsers;
+
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    private List<Message> messages;
 }
