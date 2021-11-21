@@ -75,7 +75,7 @@ public class SocketServiceImpl implements SocketService {
             }
 
             client.set("user", user);
-            errorAndDisconnect(client, 403, "Connected : " + user.getKakaoNickName() + "SessionId : " + client.getSessionId());
+            printLog(client, "Connected");
         }catch (Exception e) {
             errorAndDisconnect(client, 404, "User Not Found");
         }
