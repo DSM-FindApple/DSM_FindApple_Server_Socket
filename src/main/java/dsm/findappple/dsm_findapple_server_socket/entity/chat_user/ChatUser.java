@@ -26,6 +26,4 @@ public class ChatUser {
     @OneToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
-
-    private Boolean isBlock;
 }

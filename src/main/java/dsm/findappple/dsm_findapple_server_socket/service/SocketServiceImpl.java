@@ -28,6 +28,7 @@ import dsm.findappple.dsm_findapple_server_socket.utils.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -136,6 +137,7 @@ public class SocketServiceImpl implements SocketService {
     }
 
     @Override
+    @Transactional
     public void leaveRoom(SocketIOClient client, String chatId) {
         User user = client.get("user");
 
