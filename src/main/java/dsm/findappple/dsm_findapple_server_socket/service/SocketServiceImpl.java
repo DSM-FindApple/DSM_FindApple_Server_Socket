@@ -130,6 +130,8 @@ public class SocketServiceImpl implements SocketService {
 
         List<String> deviceTokens = deviceTokenRepository.getDeviceTokensByUser(user);
 
+        log.info(deviceTokens.toString());
+
         sendInfo(client, message, deviceTokens);
     }
 
@@ -145,11 +147,6 @@ public class SocketServiceImpl implements SocketService {
         Optional<Chat> optionalChat = chatRepository.findByChatId(chatId);
         if(!optionalChat.isPresent()) {
             errorAndDisconnect(client, 409, "Chat Not Found");
-            return;
-        }
-
-        if(!client.getAllRooms().contains(chatId)) {
-            errorAndDisconnect(client, 404, "Socket Chat User Not Found");
             return;
         }
 
@@ -230,11 +227,6 @@ public class SocketServiceImpl implements SocketService {
                 return;
             }
 
-            if(!client.getAllRooms().contains(json)) {
-                errorAndDisconnect(client, 404, "Socket Chat User Not Found");
-                return;
-            }
-
             Message message = messageRepository.save(
                     Message.builder()
                             .chat(optionalChat.get())
@@ -295,11 +287,6 @@ public class SocketServiceImpl implements SocketService {
                 return;
             }
 
-            if(!client.getAllRooms().contains(json)) {
-                errorAndDisconnect(client, 404, "Socket Chat User Not Found");
-                return;
-            }
-
             MessageImage messageImage = messageImageRepository.findByMessage_MessageId(sendImageRequest.getMessageId());
             if(messageImage == null) {
                 errorAndDisconnect(client, 404, "Chat User Not Found");
@@ -354,11 +341,6 @@ public class SocketServiceImpl implements SocketService {
 
             if(banUserRepository.existsByUserAndBanUser(user, chatUser.getUser()) || banUserRepository.existsByUserAndBanUser(chatUser.getUser(), user)) {
                 errorAndDisconnect(client, 403, "User Baned");
-                return;
-            }
-
-            if(!client.getAllRooms().contains(json)) {
-                errorAndDisconnect(client, 404, "Socket Chat User Not Found");
                 return;
             }
 
