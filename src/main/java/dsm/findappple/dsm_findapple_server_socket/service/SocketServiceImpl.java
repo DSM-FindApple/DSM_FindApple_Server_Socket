@@ -184,6 +184,8 @@ public class SocketServiceImpl implements SocketService {
 
         sendInfo(client, message, deviceTokens);
 
+        chatUserRepository.deleteAllByChat(optionalChat.get());
+        messageRepository.deleteAllByChat(optionalChat.get());
         chatRepository.deleteByChatId(chatId);
     }
 
