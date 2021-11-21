@@ -3,7 +3,6 @@ package dsm.findappple.dsm_findapple_server_socket.service;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dsm.findappple.dsm_findapple_server_socket.entity.ban_user.BanUser;
 import dsm.findappple.dsm_findapple_server_socket.entity.ban_user.BanUserRepository;
 import dsm.findappple.dsm_findapple_server_socket.entity.chat.Chat;
 import dsm.findappple.dsm_findapple_server_socket.entity.chat.ChatRepository;
@@ -184,8 +183,8 @@ public class SocketServiceImpl implements SocketService {
 
         sendInfo(client, message, deviceTokens);
 
-        chatUserRepository.deleteAllByChat(optionalChat.get());
-        messageRepository.deleteAllByChat(optionalChat.get());
+        chatUserRepository.deleteAllByChat_ChatId(chatId);
+        messageRepository.deleteAllByChat_ChatId(chatId);
         chatRepository.deleteByChatId(chatId);
     }
 
