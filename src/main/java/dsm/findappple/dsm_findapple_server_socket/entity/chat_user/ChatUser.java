@@ -1,7 +1,7 @@
 package dsm.findappple.dsm_findapple_server_socket.entity.chat_user;
 
-import dsm.project.findapple.entity.chat.Chat;
-import dsm.project.findapple.entity.user.User;
+import dsm.findappple.dsm_findapple_server_socket.entity.chat.Chat;
+import dsm.findappple.dsm_findapple_server_socket.entity.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
