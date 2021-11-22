@@ -26,4 +26,12 @@ public class ChatUser {
     @ManyToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
+
+    private Boolean isEntered;
+
+    public ChatUser updateIsEntered(Boolean isEntered) {
+        this.isEntered = isEntered;
+
+        return this;
+    }
 }

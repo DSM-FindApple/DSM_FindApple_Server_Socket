@@ -106,6 +106,11 @@ public class SocketServiceImpl implements SocketService {
             return;
         }
 
+        if(optionalChatUser.get().getIsEntered())
+            return;
+        else
+            chatUserRepository.save(optionalChatUser.get().updateIsEntered(true));
+
         ChatUser chatUser = chatUserRepository.findByChatAndUserNot(optionalChat.get(), user);
         if(chatUser == null) {
             errorAndDisconnect(client, 404, "Chat User Not Found");
