@@ -371,6 +371,7 @@ public class SocketServiceImpl implements SocketService {
                 MessageResponse.builder()
                         .messageId(message.getMessageId())
                         .chatId(message.getChat().getChatId())
+                        .kakaoId(message.getUser().getKakaoId())
                         .sendDate(message.getSendAt().toLocalDate().toString())
                         .sendTime(message.getSendAt().toLocalTime().toString())
                         .message(message.getMessage())
@@ -409,6 +410,7 @@ public class SocketServiceImpl implements SocketService {
                 ImageResponse.builder()
                         .messageId(message.getMessageId())
                         .chatId(message.getChat().getChatId())
+                        .kakaoId(message.getUser().getKakaoId())
                         .messageImageName(messageImage.getImageName())
                         .message(message.getMessage())
                         .messageType(message.getMessageType())
@@ -430,6 +432,7 @@ public class SocketServiceImpl implements SocketService {
         server.getRoomOperations(message.getChat().getChatId()).sendEvent("promise",
                 PromiseResponse.builder()
                         .promiseId(promise.getPromiseId())
+                        .kakaoId(message.getUser().getKakaoId())
                         .messageId(message.getMessageId())
                         .sendDate(message.getSendAt().toLocalDate().toString())
                         .sendTime(message.getSendAt().toLocalTime().toString())
