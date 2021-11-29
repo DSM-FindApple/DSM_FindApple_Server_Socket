@@ -3,7 +3,6 @@ package dsm.findappple.dsm_findapple_server_socket.service;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dsm.findappple.dsm_findapple_server_socket.entity.ban_user.BanUser;
 import dsm.findappple.dsm_findapple_server_socket.entity.ban_user.BanUserRepository;
 import dsm.findappple.dsm_findapple_server_socket.entity.chat.Chat;
 import dsm.findappple.dsm_findapple_server_socket.entity.chat.ChatRepository;
@@ -32,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +78,7 @@ public abstract class SocketServiceImpl implements SocketService {
             }
 
             client.set("user", user);
-            errorAndDisconnect(client, 403, "Connected : " + user.getKakaoNickName() + "SessionId : " + client.getSessionId());
+            printLog(client, "Connected");
         }catch (Exception e) {
             errorAndDisconnect(client, 404, "User Not Found");
         }
@@ -109,6 +109,11 @@ public abstract class SocketServiceImpl implements SocketService {
             return;
         }
 
+        if(optionalChatUser.get().getIsEntered())
+            return;
+        else
+            chatUserRepository.save(optionalChatUser.get().updateIsEntered(true));
+
         ChatUser chatUser = chatUserRepository.findByChatAndUserNot(optionalChat.get(), user);
         if(chatUser == null) {
             errorAndDisconnect(client, 404, "Chat User Not Found");
@@ -133,10 +138,13 @@ public abstract class SocketServiceImpl implements SocketService {
 
         List<String> deviceTokens = deviceTokenRepository.getDeviceTokensByUser(user);
 
+        log.info(deviceTokens.toString());
+
         sendInfo(client, message, deviceTokens);
     }
 
     @Override
+    @Transactional
     public void leaveRoom(SocketIOClient client, String chatId) {
         User user = client.get("user");
 
@@ -148,11 +156,6 @@ public abstract class SocketServiceImpl implements SocketService {
         Optional<Chat> optionalChat = chatRepository.findByChatId(chatId);
         if(!optionalChat.isPresent()) {
             errorAndDisconnect(client, 409, "Chat Not Found");
-            return;
-        }
-
-        if(!client.getAllRooms().contains(chatId)) {
-            errorAndDisconnect(client, 404, "Socket Chat User Not Found");
             return;
         }
 
@@ -188,6 +191,8 @@ public abstract class SocketServiceImpl implements SocketService {
 
         sendInfo(client, message, deviceTokens);
 
+        chatUserRepository.deleteAllByChat_ChatId(chatId);
+        messageRepository.deleteAllByChat_ChatId(chatId);
         chatRepository.deleteByChatId(chatId);
     }
 
@@ -230,11 +235,6 @@ public abstract class SocketServiceImpl implements SocketService {
 
             if(banUserRepository.existsByUserAndBanUser(user, chatUser.getUser()) || banUserRepository.existsByUserAndBanUser(chatUser.getUser(), user)) {
                 errorAndDisconnect(client, 403, "User Baned");
-                return;
-            }
-
-            if(!client.getAllRooms().contains(json)) {
-                errorAndDisconnect(client, 404, "Socket Chat User Not Found");
                 return;
             }
 
@@ -298,11 +298,6 @@ public abstract class SocketServiceImpl implements SocketService {
                 return;
             }
 
-            if(!client.getAllRooms().contains(json)) {
-                errorAndDisconnect(client, 404, "Socket Chat User Not Found");
-                return;
-            }
-
             MessageImage messageImage = messageImageRepository.findByMessage_MessageId(sendImageRequest.getMessageId());
             if(messageImage == null) {
                 errorAndDisconnect(client, 404, "Chat User Not Found");
@@ -357,11 +352,6 @@ public abstract class SocketServiceImpl implements SocketService {
 
             if(banUserRepository.existsByUserAndBanUser(user, chatUser.getUser()) || banUserRepository.existsByUserAndBanUser(chatUser.getUser(), user)) {
                 errorAndDisconnect(client, 403, "User Baned");
-                return;
-            }
-
-            if(!client.getAllRooms().contains(json)) {
-                errorAndDisconnect(client, 404, "Socket Chat User Not Found");
                 return;
             }
 
@@ -573,6 +563,7 @@ public abstract class SocketServiceImpl implements SocketService {
                 MessageResponse.builder()
                         .messageId(message.getMessageId())
                         .chatId(message.getChat().getChatId())
+                        .kakaoId(message.getUser().getKakaoId())
                         .sendDate(message.getSendAt().toLocalDate().toString())
                         .sendTime(message.getSendAt().toLocalTime().toString())
                         .message(message.getMessage())
@@ -582,7 +573,7 @@ public abstract class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
@@ -599,7 +590,7 @@ public abstract class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
@@ -611,6 +602,7 @@ public abstract class SocketServiceImpl implements SocketService {
                 ImageResponse.builder()
                         .messageId(message.getMessageId())
                         .chatId(message.getChat().getChatId())
+                        .kakaoId(message.getUser().getKakaoId())
                         .messageImageName(messageImage.getImageName())
                         .message(message.getMessage())
                         .messageType(message.getMessageType())
@@ -621,7 +613,7 @@ public abstract class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }
@@ -632,6 +624,7 @@ public abstract class SocketServiceImpl implements SocketService {
         server.getRoomOperations(message.getChat().getChatId()).sendEvent("promise",
                 PromiseResponse.builder()
                         .promiseId(promise.getPromiseId())
+                        .kakaoId(message.getUser().getKakaoId())
                         .messageId(message.getMessageId())
                         .sendDate(message.getSendAt().toLocalDate().toString())
                         .sendTime(message.getSendAt().toLocalTime().toString())
@@ -641,7 +634,7 @@ public abstract class SocketServiceImpl implements SocketService {
                         .build()
                 );
 
-        fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
+        //fcmUtil.sendPushMessage(deviceTokens, message.getUser().getKakaoNickName(), message.getMessage());
 
         printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : " + client.getSessionId());
     }

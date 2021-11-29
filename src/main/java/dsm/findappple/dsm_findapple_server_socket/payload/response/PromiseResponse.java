@@ -9,6 +9,7 @@ import lombok.Getter;
 public class PromiseResponse {
     private Long messageId;
     private String chatId;
+    private Long kakaoId;
     private Long promiseId;
     private String message;
     private String sendDate;

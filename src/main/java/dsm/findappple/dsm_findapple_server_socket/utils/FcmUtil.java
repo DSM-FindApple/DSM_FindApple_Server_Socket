@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+import java.io.FileInputStream;
 import java.util.List;
 
 @Component
@@ -19,16 +20,15 @@ public class FcmUtil {
     private String keyDir;
 
     public void sendPushMessage(List<String> tokens, String title, String content) {
-        try{
-            ClassPathResource resource = new ClassPathResource(keyDir);
+        try {
+            FileInputStream serviceAccount =
+                    new FileInputStream(keyDir);
 
-            FirebaseOptions firebaseOptions = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            if(FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(firebaseOptions);
-            }
+            FirebaseApp.initializeApp(options);
 
             MulticastMessage message = MulticastMessage.builder()
                     .putData("title", title)
@@ -38,7 +38,7 @@ public class FcmUtil {
 
             BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(message);
             System.out.println("successful send Message : " + response.getResponses());
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

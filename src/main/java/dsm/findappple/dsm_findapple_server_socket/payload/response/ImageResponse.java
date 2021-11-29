@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public class ImageResponse {
     private Long messageId;
     private String chatId;
+    private Long kakaoId;
     private String message;
     private String username;
     private String profileUrl;
