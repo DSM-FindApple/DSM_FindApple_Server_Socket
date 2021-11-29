@@ -22,6 +22,9 @@ import dsm.findappple.dsm_findapple_server_socket.payload.enums.MessageType;
 import dsm.findappple.dsm_findapple_server_socket.payload.request.PromiseRequest;
 import dsm.findappple.dsm_findapple_server_socket.payload.request.SendImageRequest;
 import dsm.findappple.dsm_findapple_server_socket.payload.request.SendMessageRequest;
+import dsm.findappple.dsm_findapple_server_socket.payload.request.ChangePromiseRequest;
+import dsm.findappple.dsm_findapple_server_socket.payload.request.DeleteMessageRequest;
+import dsm.findappple.dsm_findapple_server_socket.payload.request.DeletePromiseRequest;
 import dsm.findappple.dsm_findapple_server_socket.payload.response.*;
 import dsm.findappple.dsm_findapple_server_socket.utils.FcmUtil;
 import dsm.findappple.dsm_findapple_server_socket.utils.JwtProvider;
@@ -36,7 +39,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SocketServiceImpl implements SocketService {
+public abstract class SocketServiceImpl implements SocketService {
 
     private final SocketIOServer server;
 
@@ -371,6 +374,195 @@ public class SocketServiceImpl implements SocketService {
             List<String> deviceTokens = deviceTokenRepository.getDeviceTokensByUser(user);
 
             sendPromise(client, promise, deviceTokens);
+        }else {
+            errorAndDisconnect(client, 400, "Bad Request");
+        }
+    }
+
+    public void changePromise(SocketIOClient client, String json) {
+        User user = client.get("user");
+
+        if(user == null){
+            errorAndDisconnect(client, 404, "user not Found" );
+            return;
+        }
+
+        ChangePromiseRequest changePromiseRequest;
+
+        try {
+            changePromiseRequest = mapper.readValue(json, ChangePromiseRequest.class);
+        }catch (Exception e) {
+            errorAndDisconnect(client, 400, "Bad Request");
+            return;
+        }
+
+        if(changePromiseRequest != null) {
+            Optional<Chat> optionalChat = chatRepository.findByChatId(changePromiseRequest.getChatId());
+            if(!optionalChat.isPresent()) {
+                errorAndDisconnect(client, 404, "Chat Not Found");
+                return;
+            }
+
+            Optional<ChatUser> optionalChatUser = chatUserRepository.findByUserAndChat(user, optionalChat.get());
+            if(!optionalChatUser.isPresent()) {
+                errorAndDisconnect(client, 404, "Chat Not Found");
+                return;
+            }
+
+            ChatUser chatUser = chatUserRepository.findByChatAndUserNot(optionalChat.get(), user);
+            if(chatUser == null) {
+                errorAndDisconnect(client, 404, "Chat User Not Found");
+                return;
+            }
+
+            if(banUserRepository.existsByUserAndBanUser(user, chatUser.getUser()) || banUserRepository.existsByUserAndBanUser(chatUser.getUser(), user)) {
+                errorAndDisconnect(client, 403, "User Baned");
+                return;
+            }
+
+            Promise promise = promiseRepository.findByChangePromiseId(changePromiseRequest.getPromiseId());
+            if(promise == null) {
+                errorAndDisconnect(client, 404, "Promise Not Found");
+                return;
+            }
+
+            Message message = promise.getMessage();
+
+            server.getRoomOperations(optionalChat.get().getChatId()).sendEvent("changePromise",
+                    PromiseResponse.builder()
+                            .promiseId(promise.getPromiseId())
+                            .chatId(message.getChat().getChatId())
+                            .build()
+                    );
+            printLog(client, "Message Send Success, Message : " + message.getMessage() + ", Client : "+ client.getSessionId());
+        }else {
+            errorAndDisconnect(client, 400, "Bad Request");
+        }
+    }
+
+    @Override
+    public void deletePromise(SocketIOClient client, String json) {
+        User user = client.get("user");
+
+        if(user == null){
+            errorAndDisconnect(client, 404, "user not Found" );
+            return;
+        }
+
+        DeletePromiseRequest deletePromiseRequest;
+
+        try {
+            deletePromiseRequest = mapper.readValue(json, DeletePromiseRequest.class);
+        }catch (Exception e) {
+            errorAndDisconnect(client, 400, "Bad Request");
+            return;
+        }
+
+        if(deletePromiseRequest != null) {
+            Optional<Chat> optionalChat = chatRepository.findByChatId(deletePromiseRequest.getChatId());
+            if(!optionalChat.isPresent()) {
+                errorAndDisconnect(client, 404, "Chat Not Found");
+                return;
+            }
+
+            Optional<ChatUser> optionalChatUser = chatUserRepository.findByUserAndChat(user, optionalChat.get());
+            if(!optionalChatUser.isPresent()) {
+                errorAndDisconnect(client, 404, "Chat Not Found");
+                return;
+            }
+
+            ChatUser chatUser = chatUserRepository.findByChatAndUserNot(optionalChat.get(), user);
+            if(chatUser == null) {
+                errorAndDisconnect(client, 404, "Chat User Not Found");
+                return;
+            }
+
+            if(banUserRepository.existsByUserAndBanUser(user, chatUser.getUser()) || banUserRepository.existsByUserAndBanUser(chatUser.getUser(), user)) {
+                errorAndDisconnect(client, 403, "User Baned");
+                return;
+            }
+
+            Message message = messageRepository.findByMessageId(deletePromiseRequest.getMessageId());
+            if(message == null) {
+                errorAndDisconnect(client, 404, "Message Not found");
+                return;
+            }
+
+            promiseRepository.deleteByMessage(message);
+            messageRepository.save(
+                    message.deletePromise()
+            );
+
+
+            server.getRoomOperations(deletePromiseRequest.getChatId())
+                    .sendEvent("deletePromise",
+                            DeletePromiseResponse.builder()
+                                    .chatId(deletePromiseRequest.getChatId())
+                                    .messageId(message.getMessageId())
+                                    .build()
+                    );
+        }else {
+            errorAndDisconnect(client, 400, "Bad Request");
+        }
+    }
+
+    @Override
+    public void deleteMessage(SocketIOClient client, String json) {
+        User user = client.get("user");
+
+        if(user == null){
+            errorAndDisconnect(client, 404, "user not Found" );
+            return;
+        }
+
+        DeleteMessageRequest deleteMessageRequest;
+
+        try {
+            deleteMessageRequest = mapper.readValue(json, DeleteMessageRequest.class);
+        }catch (Exception e) {
+            errorAndDisconnect(client, 400, "Bad Request");
+            return;
+        }
+
+        if(deleteMessageRequest != null) {
+            Optional<Chat> optionalChat = chatRepository.findByChatId(deleteMessageRequest.getChatId());
+            if(!optionalChat.isPresent()) {
+                errorAndDisconnect(client, 404, "Chat Not Found");
+                return;
+            }
+
+            Optional<ChatUser> optionalChatUser = chatUserRepository.findByUserAndChat(user, optionalChat.get());
+            if(!optionalChatUser.isPresent()) {
+                errorAndDisconnect(client, 404, "Chat Not Found");
+                return;
+            }
+
+            ChatUser chatUser = chatUserRepository.findByChatAndUserNot(optionalChat.get(), user);
+            if(chatUser == null) {
+                errorAndDisconnect(client, 404, "Chat User Not Found");
+                return;
+            }
+
+            if(banUserRepository.existsByUserAndBanUser(user, chatUser.getUser()) || banUserRepository.existsByUserAndBanUser(chatUser.getUser(), user)) {
+                errorAndDisconnect(client, 403, "User Baned");
+                return;
+            }
+
+            Message message = messageRepository.findByMessageId(deleteMessageRequest.getMessageId());
+            if(message == null) {
+                errorAndDisconnect(client, 404, "Message Not Found");
+                return;
+            }
+
+            messageRepository.save(message.deleteMessage());
+
+            server.getRoomOperations(deleteMessageRequest.getChatId())
+                    .sendEvent("deleteMessage",
+                                DeleteMessageResponse.builder()
+                                        .chatId(deleteMessageRequest.getChatId())
+                                        .messageId(message.getMessageId())
+                                        .build()
+                            );
         }else {
             errorAndDisconnect(client, 400, "Bad Request");
         }

@@ -5,4 +5,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
+<<<<<<< Updated upstream
+=======
+    void deleteAllByChat(Chat chat);
+    void deleteAllByChat_ChatId(String chat_chatId);
+    void deleteByMessageId(Long messageId);
+    Message findByMessageId(Long messageId);
+>>>>>>> Stashed changes
 }
