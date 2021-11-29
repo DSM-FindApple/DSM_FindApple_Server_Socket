@@ -10,6 +10,7 @@ public class MessageResponse {
     private Long messageId;
     private String chatId;
     private String message;
+    private Long kakaoId;
     private String username;
     private String profileUrl;
     private String sendDate;

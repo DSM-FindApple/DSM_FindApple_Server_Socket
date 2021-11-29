@@ -17,12 +17,11 @@ import java.util.List;
 @AllArgsConstructor
 public class Chat {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String chatId;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatUser> chatUsers;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 }

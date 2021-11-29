@@ -19,13 +19,19 @@ public class ChatUser {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long chatUserId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "kakao_id")
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
-    private Boolean isBlock;
+    private Boolean isEntered;
+
+    public ChatUser updateIsEntered(Boolean isEntered) {
+        this.isEntered = isEntered;
+
+        return this;
+    }
 }

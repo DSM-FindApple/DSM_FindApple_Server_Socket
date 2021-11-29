@@ -30,5 +30,6 @@ public class SocketController {
                 ((client, data, ackSender) -> socketService.promise(client, data)));
         server.addEventListener("changePromise", String.class,
                 ((client, data, ackSender) -> socketService.promise(client, data)));
+
     }
 }
