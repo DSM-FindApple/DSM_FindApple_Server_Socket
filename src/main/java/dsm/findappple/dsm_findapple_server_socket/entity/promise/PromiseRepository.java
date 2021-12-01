@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PromiseRepository extends JpaRepository<Promise, Long> {
     Promise findByPromiseId(Long promiseId);
-    Promise findByChangePromiseId(Long promiseId);
     void deleteByMessage(Message message);
 }

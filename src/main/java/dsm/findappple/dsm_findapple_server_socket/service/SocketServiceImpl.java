@@ -410,7 +410,7 @@ public class SocketServiceImpl implements SocketService {
                 return;
             }
 
-            Promise promise = promiseRepository.findByChangePromiseId(changePromiseRequest.getPromiseId());
+            Promise promise = promiseRepository.findByPromiseId(changePromiseRequest.getPromiseId());
             if(promise == null) {
                 errorAndDisconnect(client, 404, "Promise Not Found");
                 return;
