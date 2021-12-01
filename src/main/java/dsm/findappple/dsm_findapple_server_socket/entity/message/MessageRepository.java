@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
+
     void deleteAllByChat(Chat chat);
     void deleteAllByChat_ChatId(String chat_chatId);
-
-    @Query("delete from Message m where m.chat = ?1")
-    void deleteMessages(Chat chat);
+    void deleteByMessageId(Long messageId);
+    Message findByMessageId(Long messageId);
 }

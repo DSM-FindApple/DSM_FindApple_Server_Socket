@@ -28,5 +28,11 @@ public class SocketController {
                 ((client, data, ackSender) -> socketService.sendImage(client, data)));
         server.addEventListener("promise", String.class,
                 ((client, data, ackSender) -> socketService.promise(client, data)));
+        server.addEventListener("changePromise", String.class,
+                ((client, data, ackSender) -> socketService.changePromise(client, data)));
+        server.addEventListener("deletePromise", String.class,
+                ((client, data, ackSender) -> socketService.deletePromise(client, data)));
+        server.addEventListener("deleteMessage", String.class,
+                ((client, data, ackSender) -> socketService.deleteMessage(client, data)));
     }
 }

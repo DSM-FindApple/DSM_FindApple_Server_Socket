@@ -38,4 +38,17 @@ public class Message {
 
     @Enumerated(value = EnumType.STRING)
     private MessageType messageType;
+
+    public Message deleteMessage() {
+        this.message = "메세지가 삭제되었습니다.";
+
+        return this;
+    }
+
+    public Message deletePromise() {
+        this.message = "메세지가 삭제되었습니다.";
+        this.messageType = MessageType.MESSAGE;
+
+        return this;
+    }
 }

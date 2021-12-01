@@ -10,4 +10,8 @@ public interface SocketService {
     void sendMassage(SocketIOClient client, String json);
     void sendImage(SocketIOClient client, String json);
     void promise(SocketIOClient client, String json);
+    void changePromise(SocketIOClient client, String json);
+    void deleteMessage(SocketIOClient client, String json);
+    void deletePromise(SocketIOClient client, String json);
+
 }
