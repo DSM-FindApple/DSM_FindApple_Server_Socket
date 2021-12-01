@@ -13,4 +13,5 @@ public interface ChatRepository extends JpaRepository<Chat, String> {
   
     @Query("delete from Chat c where c.chatId = ?1")
     void deleteChat(String chatId);
+}
 
