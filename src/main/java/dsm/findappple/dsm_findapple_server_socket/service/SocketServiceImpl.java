@@ -39,7 +39,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public abstract class SocketServiceImpl implements SocketService {
+public class SocketServiceImpl implements SocketService {
 
     private final SocketIOServer server;
 
